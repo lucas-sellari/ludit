@@ -2,24 +2,32 @@ import { MikroORM, RequiredEntityData } from "@mikro-orm/core";
 import { __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import config from "./mikro-orm.config";
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
+import { buildSchema } from "type-graphql";
+import { HelloResolver } from "./resolvers/hello";
 
 const main = async () => {
   const orm = await MikroORM.init(config);
-
   await orm.getMigrator().up();
 
-  // Acessar todos os dados da tabela post ^^
-  //const post = await orm.em.find(Post, {});
-  //console.log(post);
-  
-  //const post = orm.em.create(Post, {
-  //  id: 2,
-  //  title: "my second post",
-  //} as RequiredEntityData<Post>);
+  const app = express();
 
-  //await orm.em.persistAndFlush(post);
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [HelloResolver],
+      validate: false,
+    }),
+  });
+
+  await apolloServer.start();
+  apolloServer.applyMiddleware({ app });
+
+  app.listen(3333, () => {
+    console.log("server ready and listening on port 3333 ^^");
+  });
 };
 
-main().catch(error => {
-  console.log("ERRO: " + error);
+main().catch((error) => {
+  console.log("!ERRO: " + error);
 });
