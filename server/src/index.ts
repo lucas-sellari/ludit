@@ -8,6 +8,7 @@ import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 
+
 const main = async () => {
   const orm = await MikroORM.init(config);
   await orm.getMigrator().up();
