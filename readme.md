@@ -3,10 +3,10 @@
 	- React
 	- Typescript
 	- GraphQL
-	- URQL/Apollo (não definido ainda)
+	- URQL (talvez eu mude para o Apollo, não definido ainda)
 	- Node.JS
 	- PostgreSQL
-	- TypeORM 
+	- MikroORM 
 	- Redis 
-	- Next.js
+	- Next.js (com Chakra UI)
 	- TypeGraphQL
