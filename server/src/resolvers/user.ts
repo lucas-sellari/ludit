@@ -12,6 +12,7 @@ import {
   Query,
 } from "type-graphql";
 import argon2 from "argon2";
+import { COOKIE_NAME } from "../constants";
 //import { EntityManager } from "@mikro-orm/postgresql";
 
 @InputType()
@@ -162,5 +163,21 @@ export class UserResolver {
     return {
       user,
     };
+  }
+
+  @Mutation(() => Boolean)
+  async logout(@Ctx() { req, res }: MyContext): Promise<Boolean> {
+    // remover a session do Redis
+    return new Promise((resolve) =>
+      req.session.destroy((error) => {
+        res.clearCookie(COOKIE_NAME); // apagar o cookie, mesmo que não consigamos remover a session do Redis
+        if (error) {
+          console.log(error);
+          resolve(false);
+          return;
+        }
+        resolve(true);
+      })
+    );
   }
 }
