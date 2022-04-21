@@ -7,6 +7,7 @@ import { RequiredEntityData } from "@mikro-orm/core";
 export class PostResolver {
   @Query(() => [Post])
   posts(@Ctx() { em }: MyContext): Promise<Post[]> {
+    // await sleep(3000);
     return em.find(Post, {});
   }
 
