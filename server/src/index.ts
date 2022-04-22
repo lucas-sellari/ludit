@@ -1,24 +1,25 @@
 import { MikroORM, RequiredEntityData } from "@mikro-orm/core";
-import { COOKIE_NAME, __prod__ } from "./constants";
-import config from "./mikro-orm.config";
-import express from "express";
-import { ApolloServer } from "apollo-server-express";
-import { buildSchema } from "type-graphql";
-import { HelloResolver } from "./resolvers/hello";
-import { PostResolver } from "./resolvers/post";
-import { UserResolver } from "./resolvers/user";
-import * as redis from "redis";
-import session from "express-session";
-import connectRedis from "connect-redis";
-import { MyContext } from "./types";
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
 } from "apollo-server-core";
+import { ApolloServer } from "apollo-server-express";
+import connectRedis from "connect-redis";
 import cors from "cors";
+import express from "express";
+import session from "express-session";
+import * as redis from "redis";
+import { buildSchema } from "type-graphql";
+import { COOKIE_NAME, __prod__ } from "./constants";
+import config from "./mikro-orm.config";
+import { HelloResolver } from "./resolvers/hello";
+import { PostResolver } from "./resolvers/post";
+import { UserResolver } from "./resolvers/user";
+import { MyContext } from "./types";
 
 const main = async () => {
   const orm = await MikroORM.init(config);
+  //orm.em.nativeDelete(User, {});
   await orm.getMigrator().up();
 
   const app = express();

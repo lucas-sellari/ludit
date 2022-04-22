@@ -14,8 +14,6 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
 
   let body;
 
-  console.log("dados: ", data)
-
   // carregando dados
   if (fetching) {
     body = null;

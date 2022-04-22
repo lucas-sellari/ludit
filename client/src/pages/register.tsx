@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
@@ -20,10 +20,11 @@ export const Register: React.FC<registerProps> = ({}) => {
       <Formik
         initialValues={{
           username: "",
+          email: "",
           password: "",
         }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register(values);
+          const response = await register({ options: values });
 
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data?.register.errors));
@@ -39,6 +40,13 @@ export const Register: React.FC<registerProps> = ({}) => {
               name="username"
               placeholder="Nome de usuário"
               label="Nome de usuário"
+              onChange={handleChange}
+            />
+
+            <InputField
+              name="email"
+              placeholder="E-mail"
+              label="E-mail"
               onChange={handleChange}
             />
 
