@@ -36,19 +36,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@mikro-orm/core");
+const apollo_server_core_1 = require("apollo-server-core");
+const apollo_server_express_1 = require("apollo-server-express");
+const connect_redis_1 = __importDefault(require("connect-redis"));
+const cors_1 = __importDefault(require("cors"));
+const express_1 = __importDefault(require("express"));
+const express_session_1 = __importDefault(require("express-session"));
+const redis = __importStar(require("redis"));
+const type_graphql_1 = require("type-graphql");
 const constants_1 = require("./constants");
 const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
-const express_1 = __importDefault(require("express"));
-const apollo_server_express_1 = require("apollo-server-express");
-const type_graphql_1 = require("type-graphql");
 const hello_1 = require("./resolvers/hello");
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
-const redis = __importStar(require("redis"));
-const express_session_1 = __importDefault(require("express-session"));
-const connect_redis_1 = __importDefault(require("connect-redis"));
-const apollo_server_core_1 = require("apollo-server-core");
-const cors_1 = __importDefault(require("cors"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();

@@ -1,28 +1,19 @@
 import { RequiredEntityData } from "@mikro-orm/core";
-import { User } from "../entities/User";
+import argon2 from "argon2";
 import { MyContext } from "src/types";
+import validateRegister from "../utils/validateRegister";
 import {
-  Field,
-  InputType,
-  Mutation,
-  Resolver,
   Arg,
   Ctx,
+  Field,
+  Mutation,
   ObjectType,
   Query,
+  Resolver,
 } from "type-graphql";
-import argon2 from "argon2";
 import { COOKIE_NAME } from "../constants";
-//import { EntityManager } from "@mikro-orm/postgresql";
-
-@InputType()
-class UsernamePasswordInput {
-  @Field(() => String)
-  username: string;
-
-  @Field(() => String)
-  password: string;
-}
+import { User } from "../entities/User";
+import { UsernamePasswordInput } from "./UsernamePasswordInput";
 
 @ObjectType()
 class FieldError {
@@ -49,7 +40,6 @@ export class UserResolver {
     if (!req.session.userId) {
       return null;
     }
-
     // se tem um cookie, está logado
     const user = await em.findOne(User, { id: req.session.userId });
 
@@ -61,49 +51,22 @@ export class UserResolver {
     @Arg("options", () => UsernamePasswordInput) options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    if (options.username.length <= 2) {
-      return {
-        errors: [
-          {
-            field: "username",
-            message: "length must be greater than 2",
-          },
-        ],
-      };
-    }
+    const errors = validateRegister(options);
 
-    if (options.password.length <= 3) {
-      return {
-        errors: [
-          {
-            field: "password",
-            message: "length must be greater than 3",
-          },
-        ],
-      };
+    // retorna se tiver algum erro
+    if (errors) {
+      return { errors };
     }
 
     const hashedPassword = await argon2.hash(options.password);
 
     const user = em.create(User, {
       username: options.username,
+      email: options.email,
       password: hashedPassword,
     } as RequiredEntityData<User>);
-    //let user;
-    try {
-      //antigamente dava problema, então usávamos isso aqui comentado com a queryBuilder
-      //const result = await (em as EntityManager)
-      //  .createQueryBuilder(User)
-      //  .getKnexQuery()
-      //  .insert({
-      //    username: options.username,
-      //    password: hashedPassword,
-      //    created_at: new Date(),
-      //    updated_at: new Date(),
-      //  })
-      //  .returning("*");
-      //user = result[0];
 
+    try {
       await em.persistAndFlush(user);
     } catch (error) {
       if (error.code === "23505") {
@@ -130,22 +93,28 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg("options", () => UsernamePasswordInput) options: UsernamePasswordInput,
+    @Arg("usernameOrEmail", () => String) usernameOrEmail: string,
+    @Arg("password", () => String) password: string,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    const user = await em.findOne(User, { username: options.username });
+    const user = await em.findOne(
+      User,
+      usernameOrEmail.includes("@")
+        ? { email: usernameOrEmail }
+        : { username: usernameOrEmail }
+    );
 
     if (!user) {
       return {
         errors: [
           {
-            field: "username",
-            message: "that username does not exist",
+            field: "usernameOrEmail",
+            message: "incorrect password or email",
           },
         ],
       };
     }
-    const valid = await argon2.verify(user.password, options.password);
+    const valid = await argon2.verify(user.password, password);
 
     if (!valid) {
       return {
@@ -180,4 +149,14 @@ export class UserResolver {
       })
     );
   }
+
+  // @Mutation(() => Boolean)
+  // async forgotPassword(
+  //   @Arg("email", () => String) //email: string,
+  //   @Ctx()
+  //   {}: MyContext
+  // ): Promise<Boolean> {
+  //   // const user = await em.findOne(User, { email });
+  //   return true;
+  // }
 }

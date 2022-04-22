@@ -19,7 +19,7 @@ export const Login: React.FC<loginProps> = ({}) => {
     <Wrapper variant="small">
       <Formik
         initialValues={{
-          username: "",
+          usernameOrEmail: "",
           password: "",
         }}
         onSubmit={async (values, { setErrors }) => {
@@ -36,9 +36,9 @@ export const Login: React.FC<loginProps> = ({}) => {
         {({ isSubmitting, handleChange }) => (
           <Form>
             <InputField
-              name="username"
-              placeholder="Nome de usuário"
-              label="Nome de usuário"
+              name="usernameOrEmail"
+              placeholder="Nome de usuário ou e-mail"
+              label="Nome de usuário ou e-mail"
               onChange={handleChange}
             />
 
