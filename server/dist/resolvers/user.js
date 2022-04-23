@@ -26,10 +26,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
 const argon2_1 = __importDefault(require("argon2"));
-const validateRegister_1 = __importDefault(require("../utils/validateRegister"));
 const type_graphql_1 = require("type-graphql");
+const uuid_1 = require("uuid");
 const constants_1 = require("../constants");
 const User_1 = require("../entities/User");
+const sendEmail_1 = __importDefault(require("../utils/sendEmail"));
+const validateRegister_1 = __importDefault(require("../utils/validateRegister"));
 const UsernamePasswordInput_1 = require("./UsernamePasswordInput");
 let FieldError = class FieldError {
 };
@@ -146,6 +148,19 @@ let UserResolver = class UserResolver {
             }));
         });
     }
+    forgotPassword(email, { em, redis }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield em.findOne(User_1.User, { email });
+            if (!user) {
+                return true;
+            }
+            const token = (0, uuid_1.v4)();
+            yield redis.set(constants_1.FORGET_PASSWORD_PREFIX + token, user.id);
+            yield redis.expire(constants_1.FORGET_PASSWORD_PREFIX + token, 60 * 60 * 24 * 3);
+            yield (0, sendEmail_1.default)(email, `<a href='http://localhost:3000/change-password/${token}'>Clique aqui para redefinir a senha</a>`);
+            return true;
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => User_1.User, { nullable: true }),
@@ -178,6 +193,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "logout", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)("email", () => String)),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "forgotPassword", null);
 UserResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], UserResolver);
