@@ -1,6 +1,7 @@
-import { Button } from "@chakra-ui/react";
+import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import InputField from "../components/InputField";
@@ -58,6 +59,12 @@ export const Login: React.FC<loginProps> = ({}) => {
             >
               Login
             </Button>
+
+            <Flex>
+              <NextLink href="/forgot-password">
+                <Link ml="auto">Esqueceu a senha?</Link>
+              </NextLink>
+            </Flex>
           </Form>
         )}
       </Formik>
