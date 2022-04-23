@@ -1,7 +1,6 @@
 import { RequiredEntityData } from "@mikro-orm/core";
 import argon2 from "argon2";
 import { MyContext } from "src/types";
-import validateRegister from "../utils/validateRegister";
 import {
   Arg,
   Ctx,
@@ -11,8 +10,11 @@ import {
   Query,
   Resolver,
 } from "type-graphql";
-import { COOKIE_NAME } from "../constants";
+import { v4 } from "uuid";
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
 import { User } from "../entities/User";
+import sendEmail from "../utils/sendEmail";
+import validateRegister from "../utils/validateRegister";
 import { UsernamePasswordInput } from "./UsernamePasswordInput";
 
 @ObjectType()
@@ -150,13 +152,28 @@ export class UserResolver {
     );
   }
 
-  // @Mutation(() => Boolean)
-  // async forgotPassword(
-  //   @Arg("email", () => String) //email: string,
-  //   @Ctx()
-  //   {}: MyContext
-  // ): Promise<Boolean> {
-  //   // const user = await em.findOne(User, { email });
-  //   return true;
-  // }
+  @Mutation(() => Boolean)
+  async forgotPassword(
+    @Arg("email", () => String) email: string,
+    @Ctx() { em, redis }: MyContext
+  ): Promise<Boolean> {
+    const user = await em.findOne(User, { email });
+
+    if (!user) {
+      // o email não existe no BD
+      return true;
+    }
+
+    const token = v4();
+
+    await redis.set(FORGET_PASSWORD_PREFIX + token, user.id);
+    await redis.expire(FORGET_PASSWORD_PREFIX + token, 60 * 60 * 24 * 3); // expira em 3 dias
+
+    await sendEmail(
+      email,
+      `<a href='http://localhost:3000/change-password/${token}'>Clique aqui para redefinir a senha</a>`
+    );
+
+    return true;
+  }
 }

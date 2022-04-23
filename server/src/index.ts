@@ -8,7 +8,7 @@ import connectRedis from "connect-redis";
 import cors from "cors";
 import express from "express";
 import session from "express-session";
-import * as redis from "redis";
+import Redis from "ioredis";
 import { buildSchema } from "type-graphql";
 import { COOKIE_NAME, __prod__ } from "./constants";
 import config from "./mikro-orm.config";
@@ -25,8 +25,7 @@ const main = async () => {
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redisClient = redis.createClient({ legacyMode: true });
-  await redisClient.connect();
+  const redis = new Redis();
 
   app.use(
     cors({
@@ -39,7 +38,7 @@ const main = async () => {
     session({
       name: COOKIE_NAME,
       store: new RedisStore({
-        client: redisClient,
+        client: redis,
         disableTouch: true,
       } as RequiredEntityData<typeof connectRedis>),
       cookie: {
@@ -64,7 +63,7 @@ const main = async () => {
         ? ApolloServerPluginLandingPageDisabled()
         : ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
+    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }),
   });
 
   await apolloServer.start();
