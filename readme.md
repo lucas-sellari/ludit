@@ -6,7 +6,7 @@
 	- URQL (talvez eu mude para o Apollo, não definido ainda)
 	- Node.JS
 	- PostgreSQL
-	- MikroORM 
+	- TypeORM <s>MikroORM</s> 
 	- Redis 
 	- Next.js (com Chakra UI)
 	- TypeGraphQL

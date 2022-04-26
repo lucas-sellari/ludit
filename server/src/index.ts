@@ -1,4 +1,3 @@
-import { MikroORM, RequiredEntityData } from "@mikro-orm/core";
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
@@ -9,18 +8,27 @@ import cors from "cors";
 import express from "express";
 import session from "express-session";
 import Redis from "ioredis";
+import "reflect-metadata";
 import { buildSchema } from "type-graphql";
+import { DataSource } from "typeorm";
 import { COOKIE_NAME, __prod__ } from "./constants";
-import config from "./mikro-orm.config";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
+import config from "./type-rom.config";
 import { MyContext } from "./types";
 
 const main = async () => {
-  const orm = await MikroORM.init(config);
-  //orm.em.nativeDelete(User, {});
-  await orm.getMigrator().up();
+  const myDataSource = new DataSource(config);
+
+  await myDataSource
+    .initialize()
+    .then(() => {
+      console.log("🚀 connected to the database 🚀");
+    })
+    .catch((error) => {
+      console.error("🤨 couldn't stablish database connection: ", error);
+    });
 
   const app = express();
 
@@ -40,12 +48,12 @@ const main = async () => {
       store: new RedisStore({
         client: redis,
         disableTouch: true,
-      } as RequiredEntityData<typeof connectRedis>),
+      }),
       cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 anos kkk
-        httpOnly: true, // cookie inacessível pelo front
-        secure: __prod__, // se o cookie vai funcionar apenas em https
-        sameSite: "lax", // defesa contra csrf
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+        httpOnly: true,
+        secure: __prod__,
+        sameSite: "lax",
       },
       saveUninitialized: false,
       secret: "gotasecretcanyoukeepit",
@@ -63,7 +71,7 @@ const main = async () => {
         ? ApolloServerPluginLandingPageDisabled()
         : ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }),
+    context: ({ req, res }): MyContext => ({ req, res, redis }),
   });
 
   await apolloServer.start();
