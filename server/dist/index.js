@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@mikro-orm/core");
 const apollo_server_core_1 = require("apollo-server-core");
 const apollo_server_express_1 = require("apollo-server-express");
 const connect_redis_1 = __importDefault(require("connect-redis"));
@@ -20,15 +19,24 @@ const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const express_session_1 = __importDefault(require("express-session"));
 const ioredis_1 = __importDefault(require("ioredis"));
+require("reflect-metadata");
 const type_graphql_1 = require("type-graphql");
+const typeorm_1 = require("typeorm");
 const constants_1 = require("./constants");
-const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const hello_1 = require("./resolvers/hello");
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
+const type_rom_config_1 = __importDefault(require("./type-rom.config"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
-    yield orm.getMigrator().up();
+    const myDataSource = new typeorm_1.DataSource(type_rom_config_1.default);
+    yield myDataSource
+        .initialize()
+        .then(() => {
+        console.log("🚀 connected to the database 🚀");
+    })
+        .catch((error) => {
+        console.error("🤨 couldn't stablish database connection: ", error);
+    });
     const app = (0, express_1.default)();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
     const redis = new ioredis_1.default();
@@ -62,7 +70,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 ? (0, apollo_server_core_1.ApolloServerPluginLandingPageDisabled)()
                 : (0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)(),
         ],
-        context: ({ req, res }) => ({ em: orm.em, req, res, redis }),
+        context: ({ req, res }) => ({ req, res, redis }),
     });
     yield apolloServer.start();
     apolloServer.applyMiddleware({

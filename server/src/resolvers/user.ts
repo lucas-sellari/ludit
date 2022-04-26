@@ -1,4 +1,3 @@
-import { RequiredEntityData } from "@mikro-orm/core";
 import argon2 from "argon2";
 import { MyContext } from "src/types";
 import {
@@ -38,38 +37,33 @@ class UserResponse {
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { em, req }: MyContext): Promise<User | null> {
+  async me(@Ctx() { req }: MyContext): Promise<User | null> {
     if (!req.session.userId) {
       return null;
     }
     // se tem um cookie, está logado
-    const user = await em.findOne(User, { id: req.session.userId });
-
-    return user;
+    return await User.findOne({ where: { id: req.session.userId } });
   }
 
   @Mutation(() => UserResponse)
   async register(
     @Arg("options", () => UsernamePasswordInput) options: UsernamePasswordInput,
-    @Ctx() { em, req }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const errors = validateRegister(options);
 
-    // retorna se tiver algum erro
     if (errors) {
       return { errors };
     }
 
-    const hashedPassword = await argon2.hash(options.password);
-
-    const user = em.create(User, {
+    const user = User.create({
       username: options.username,
       email: options.email,
-      password: hashedPassword,
-    } as RequiredEntityData<User>);
+      password: await argon2.hash(options.password),
+    });
 
     try {
-      await em.persistAndFlush(user);
+      await user.save();
     } catch (error) {
       if (error.code === "23505") {
         //erro: nome de usuário já existente
@@ -85,7 +79,6 @@ export class UserResolver {
       console.log("!ERRO: " + error.message);
     }
 
-    // login automático do usuário (vai guardar o id do user no cookie)
     req.session.userId = user.id;
 
     return {
@@ -97,14 +90,13 @@ export class UserResolver {
   async login(
     @Arg("usernameOrEmail", () => String) usernameOrEmail: string,
     @Arg("password", () => String) password: string,
-    @Ctx() { em, req }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    const user = await em.findOne(
-      User,
-      usernameOrEmail.includes("@")
+    const user = await User.findOne({
+      where: usernameOrEmail.includes("@")
         ? { email: usernameOrEmail }
-        : { username: usernameOrEmail }
-    );
+        : { username: usernameOrEmail },
+    });
 
     if (!user) {
       return {
@@ -155,9 +147,9 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg("email", () => String) email: string,
-    @Ctx() { em, redis }: MyContext
+    @Ctx() { redis }: MyContext
   ): Promise<Boolean> {
-    const user = await em.findOne(User, { email });
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
       // o email não existe no BD
@@ -181,7 +173,7 @@ export class UserResolver {
   async changePassword(
     @Arg("token", () => String) token: string,
     @Arg("newPassword", () => String) newPassword: string,
-    @Ctx() { em, redis, req }: MyContext
+    @Ctx() { redis, req }: MyContext
   ): Promise<UserResponse> {
     if (newPassword.length <= 3) {
       return {
@@ -208,7 +200,9 @@ export class UserResolver {
       };
     }
 
-    const user = await em.findOne(User, { id: Number.parseInt(userId) });
+    const userIdParsed = Number.parseInt(userId);
+
+    const user = await User.findOne({ where: { id: userIdParsed } });
 
     if (!user) {
       return {
@@ -221,11 +215,12 @@ export class UserResolver {
       };
     }
 
-    user.password = await argon2.hash(newPassword);
-    await em.persistAndFlush(user);
+    await User.update(
+      { id: userIdParsed },
+      { password: await argon2.hash(newPassword) }
+    );
     await redis.del(key);
 
-    // logar o usuário após mudança de senha :)
     req.session.userId = user.id;
 
     return { user };
