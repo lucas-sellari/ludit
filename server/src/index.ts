@@ -10,19 +10,15 @@ import session from "express-session";
 import Redis from "ioredis";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
-import { DataSource } from "typeorm";
 import { COOKIE_NAME, __prod__ } from "./constants";
+import { AppDataSource } from "./createDataSource";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
-import config from "./type-rom.config";
 import { MyContext } from "./types";
 
 const main = async () => {
-  const myDataSource = new DataSource(config);
-
-  await myDataSource
-    .initialize()
+  await AppDataSource.initialize()
     .then(() => {
       console.log("🚀 connected to the database 🚀");
     })
