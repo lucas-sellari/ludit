@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Link } from "@chakra-ui/react";
+import { Button, Flex, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
@@ -12,7 +12,7 @@ import toErrorMap from "../utils/toErrorMap";
 
 interface loginProps {}
 
-export const Login: React.FC<loginProps> = ({}) => {
+const Login: React.FC<loginProps> = ({}) => {
   const [{}, login] = useLoginMutation();
   const router = useRouter();
 

@@ -1,5 +1,7 @@
 import { cacheExchange, QueryInput } from "@urql/exchange-graphcache";
-import { dedupExchange, fetchExchange } from "urql";
+import { NextUrqlClientConfig } from "next-urql";
+import Router from "next/router";
+import { dedupExchange, errorExchange, fetchExchange } from "urql";
 import {
   LoginMutation,
   LogoutMutation,
@@ -8,7 +10,6 @@ import {
   RegisterMutation,
 } from "../generated/graphql";
 import { betterUpdateQuery } from "./betterUpdateQuery";
-import { NextUrqlClientConfig } from "next-urql";
 
 const createUrqlClient = (ssrExchange: any) => {
   return {
@@ -72,6 +73,13 @@ const createUrqlClient = (ssrExchange: any) => {
               );
             },
           },
+        },
+      }),
+      errorExchange({
+        onError(error) {
+          if (error.message.includes("not logged in")) {
+            Router.replace("/login");
+          }
         },
       }),
       ssrExchange,
