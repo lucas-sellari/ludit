@@ -21,16 +21,13 @@ const express_session_1 = __importDefault(require("express-session"));
 const ioredis_1 = __importDefault(require("ioredis"));
 require("reflect-metadata");
 const type_graphql_1 = require("type-graphql");
-const typeorm_1 = require("typeorm");
 const constants_1 = require("./constants");
+const createDataSource_1 = require("./createDataSource");
 const hello_1 = require("./resolvers/hello");
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
-const type_rom_config_1 = __importDefault(require("./type-rom.config"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    const myDataSource = new typeorm_1.DataSource(type_rom_config_1.default);
-    yield myDataSource
-        .initialize()
+    yield createDataSource_1.AppDataSource.initialize()
         .then(() => {
         console.log("🚀 connected to the database 🚀");
     })
