@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FakePosts1651169614766 = void 0;
-class FakePosts1651169614766 {
+exports.FakePosts1651171318034 = void 0;
+class FakePosts1651171318034 {
     up(queryRunner) {
         return __awaiter(this, void 0, void 0, function* () {
             yield queryRunner.query(`
@@ -294,5 +294,5 @@ Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscip
         return __awaiter(this, void 0, void 0, function* () { });
     }
 }
-exports.FakePosts1651169614766 = FakePosts1651169614766;
-//# sourceMappingURL=1651169614766-FakePosts.js.map
+exports.FakePosts1651171318034 = FakePosts1651171318034;
+//# sourceMappingURL=1651171318034-FakePosts.js.map

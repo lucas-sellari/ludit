@@ -1,19 +1,8 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FakePosts1651169614766 = void 0;
-class FakePosts1651169614766 {
-    up(queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield queryRunner.query(`
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class FakePosts1651171318034 implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
     insert into post (title, text, "creatorId") values ('All About the Feathers (Por Las Plumas)', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.', 1);
 insert into post (title, text, "creatorId") values ('Mariachi, El', 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.', 1);
 insert into post (title, text, "creatorId") values ('One Missed Call', 'In sagittis dui vel nisl. Duis ac nibh. Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus.
@@ -288,11 +277,7 @@ insert into post (title, text, "creatorId") values ('Kummelin jackpot', 'Integer
 Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.', 1);
 
     `);
-        });
-    }
-    down(_) {
-        return __awaiter(this, void 0, void 0, function* () { });
-    }
+  }
+
+  public async down(_: QueryRunner): Promise<void> {}
 }
-exports.FakePosts1651169614766 = FakePosts1651169614766;
-//# sourceMappingURL=1651169614766-FakePosts.js.map
