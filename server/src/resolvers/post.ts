@@ -3,11 +3,13 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Int,
   Mutation,
   Query,
   Resolver,
+  Root,
   UseMiddleware,
 } from "type-graphql";
 import { AppDataSource } from "../createDataSource";
@@ -23,7 +25,7 @@ class PostInput {
   text: string;
 }
 
-@Resolver()
+@Resolver(Post)
 export class PostResolver {
   @Query(() => [Post])
   async posts(
@@ -88,5 +90,10 @@ export class PostResolver {
     } catch {
       return false;
     }
+  }
+
+  @FieldResolver(() => String)
+  textSnippet(@Root() root: Post) {
+    return `${root.text.slice(0, 100)}...`;
   }
 }

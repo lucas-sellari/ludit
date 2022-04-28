@@ -92,6 +92,9 @@ let PostResolver = class PostResolver {
             }
         });
     }
+    textSnippet(root) {
+        return `${root.text.slice(0, 100)}...`;
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => [Post_1.Post]),
@@ -132,8 +135,15 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "deletePost", null);
+__decorate([
+    (0, type_graphql_1.FieldResolver)(() => String),
+    __param(0, (0, type_graphql_1.Root)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Post_1.Post]),
+    __metadata("design:returntype", void 0)
+], PostResolver.prototype, "textSnippet", null);
 PostResolver = __decorate([
-    (0, type_graphql_1.Resolver)()
+    (0, type_graphql_1.Resolver)(Post_1.Post)
 ], PostResolver);
 exports.PostResolver = PostResolver;
 //# sourceMappingURL=post.js.map
