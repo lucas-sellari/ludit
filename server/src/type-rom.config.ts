@@ -1,6 +1,7 @@
 import { DataSourceOptions } from "typeorm";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
+import path from "path";
 
 export default {
   type: "postgres",
@@ -12,4 +13,5 @@ export default {
   entities: [Post, User],
   logging: true,
   synchronize: true, //não precisa ficar criando migrations na mão :D
+  migrations: [path.join(__dirname, "./migrations/*")],
 } as unknown as DataSourceOptions;
