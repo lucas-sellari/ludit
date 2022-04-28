@@ -1,29 +1,62 @@
-import { Link } from "@chakra-ui/react";
+import { Button, Flex, Heading, Link } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
+import NextLink from "next/link";
 import Layout from "../components/Layout";
+import PostList from "../components/PostList";
 import { usePostsQuery } from "../generated/graphql";
 import createUrqlClient from "../utils/createUrqlClient";
-import NextLink from "next/link";
 
 const Index = () => {
-  const [{ data }] = usePostsQuery({
+  const [{ data, fetching }] = usePostsQuery({
     variables: {
       limit: 10,
     },
   });
 
+  if (!fetching && !data) {
+    return (
+      <div>Por algum motivo, houve uma falha ao requisitar os dados ☹️</div>
+    );
+  }
+
   return (
     <Layout>
-      <NextLink href="/create-post">
-        <Link color={"black"}>Escrever publicação</Link>
-      </NextLink>
-      <h1>Hello, world!</h1>
+      <Flex alignItems={"center"}>
+        <Heading>LuDit</Heading>
+        <NextLink href="/create-post">
+          <Button
+            colorScheme="red"
+            size={"sm"}
+            variant={"outline"}
+            ml={"auto"}
+            textColor={"black"}
+          >
+            Criar post
+          </Button>
+        </NextLink>
+      </Flex>
       <br />
-      {!data ? (
+      {!data && fetching ? (
         <div>Carregando...</div>
       ) : (
-        data.posts.map((post) => <div key={post.id}>{post.title}</div>)
+        <PostList posts={data!.posts} />
       )}
+
+      {data ? (
+        <Flex>
+          <Button
+            colorScheme="red"
+            size={"sm"}
+            variant={"outline"}
+            textColor={"black"}
+            m={"auto"}
+            my={8}
+            isLoading={fetching}
+          >
+            Carregar mais...
+          </Button>
+        </Flex>
+      ) : null}
     </Layout>
   );
 };
