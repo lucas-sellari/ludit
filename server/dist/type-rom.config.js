@@ -16,6 +16,6 @@ exports.default = {
     entities: [Post_1.Post, User_1.User],
     logging: true,
     synchronize: true,
-    migrations: [path_1.default.join(__dirname, "./migrations/*")],
+    migrations: [path_1.default.join(__dirname, "./migrations/*.ts")],
 };
 //# sourceMappingURL=type-rom.config.js.map
