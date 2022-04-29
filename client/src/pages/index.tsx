@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Link } from "@chakra-ui/react";
+import { Button, Flex, Heading } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import Layout from "../components/Layout";
@@ -25,7 +25,7 @@ const Index = () => {
         <Heading>LuDit</Heading>
         <NextLink href="/create-post">
           <Button
-            colorScheme="red"
+            colorScheme="teal"
             size={"sm"}
             variant={"outline"}
             ml={"auto"}
@@ -45,7 +45,7 @@ const Index = () => {
       {data ? (
         <Flex>
           <Button
-            colorScheme="red"
+            colorScheme="teal"
             size={"sm"}
             variant={"outline"}
             textColor={"black"}

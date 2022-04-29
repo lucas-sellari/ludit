@@ -1,10 +1,11 @@
-import { Button, Flex, Link } from "@chakra-ui/react";
+import { Flex, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import InputField from "../components/InputField";
+import StyledButton from "../components/StyledButton";
 import Wrapper from "../components/Wrapper";
 import { useLoginMutation } from "../generated/graphql";
 import createUrqlClient from "../utils/createUrqlClient";
@@ -54,14 +55,7 @@ const Login: React.FC<loginProps> = ({}) => {
               onChange={handleChange}
             />
 
-            <Button
-              type="submit"
-              colorScheme="teal"
-              mt={4}
-              isLoading={isSubmitting}
-            >
-              Login
-            </Button>
+            <StyledButton isLoading={isSubmitting}>Login</StyledButton>
 
             <Flex>
               <NextLink href="/forgot-password">
