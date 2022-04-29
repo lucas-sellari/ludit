@@ -1,4 +1,4 @@
-import { Box, Button, Link } from "@chakra-ui/react";
+import { Box, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { NextPage } from "next";
 import { withUrqlClient } from "next-urql";
@@ -6,6 +6,7 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import InputField from "../../components/InputField";
+import StyledButton from "../../components/StyledButton";
 import Wrapper from "../../components/Wrapper";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import createUrqlClient from "../../utils/createUrqlClient";
@@ -62,14 +63,7 @@ const ChangePassword: NextPage<{ token: string }> = () => {
               </Box>
             ) : null}
 
-            <Button
-              type="submit"
-              colorScheme="teal"
-              mt={4}
-              isLoading={isSubmitting}
-            >
-              Salvar
-            </Button>
+            <StyledButton isLoading={isSubmitting}>Salvar</StyledButton>
           </Form>
         )}
       </Formik>
