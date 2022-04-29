@@ -1,8 +1,9 @@
-import { Box, Button } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
 import InputField from "../components/InputField";
+import StyledButton from "../components/StyledButton";
 import Wrapper from "../components/Wrapper";
 import { useForgotPasswordMutation } from "../generated/graphql";
 import createUrqlClient from "../utils/createUrqlClient";
@@ -26,8 +27,8 @@ const ForgotPassword: React.FC<{}> = ({}) => {
         {({ isSubmitting, handleChange, values }) =>
           complete ? (
             <Box>
-              Se existir uma conta vinculada ao e-mail <b>{values.email}</b>, iremos
-              enviar um e-mail com um link para redefinição da senha. 🤠
+              Se existir uma conta vinculada ao e-mail <b>{values.email}</b>,
+              iremos enviar um e-mail com um link para redefinição da senha. 🤠
             </Box>
           ) : (
             <Form>
@@ -39,14 +40,9 @@ const ForgotPassword: React.FC<{}> = ({}) => {
                 onChange={handleChange}
               />
 
-              <Button
-                type="submit"
-                colorScheme="teal"
-                mt={4}
-                isLoading={isSubmitting}
-              >
+              <StyledButton isLoading={isSubmitting}>
                 Enviar link de recuperação
-              </Button>
+              </StyledButton>
             </Form>
           )
         }
