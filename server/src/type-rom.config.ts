@@ -13,5 +13,5 @@ export default {
   entities: [Post, User],
   logging: true,
   synchronize: true, //não precisa ficar criando migrations na mão :D
-  migrations: [path.join(__dirname, "./migrations/*")],
+  migrations: [path.join(__dirname, "./migrations/*.ts")],
 } as unknown as DataSourceOptions;
