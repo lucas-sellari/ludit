@@ -42,10 +42,10 @@ const Index = () => {
       {!data && fetching ? (
         <div>Carregando...</div>
       ) : (
-        <PostList posts={data!.posts} />
+        <PostList posts={data!.posts.posts} />
       )}
 
-      {data ? (
+      {data && data?.posts.hasMore ? (
         <Flex>
           <Button
             colorScheme="teal"
@@ -58,7 +58,7 @@ const Index = () => {
             onClick={() => {
               setVariables({
                 limit: variables.limit,
-                cursor: data.posts[data.posts.length - 1].createdAt,
+                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt,
               });
             }}
           >
