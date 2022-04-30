@@ -7,6 +7,7 @@ import {
   InputType,
   Int,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
   Root,
@@ -25,14 +26,23 @@ class PostInput {
   text: string;
 }
 
+@ObjectType()
+class PaginatedPosts {
+  @Field(() => [Post])
+  posts: Post[];
+
+  @Field(() => Boolean)
+  hasMore: boolean;
+}
+
 @Resolver(Post)
 export class PostResolver {
-  @Query(() => [Post])
+  @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null
-  ): Promise<Post[]> {
-    const realLimit = Math.min(50, limit);
+  ): Promise<PaginatedPosts> {
+    const realLimit = Math.min(50, limit) + 1;
 
     const queryBuilder = AppDataSource.getRepository(Post)
       .createQueryBuilder("posts")
@@ -45,7 +55,12 @@ export class PostResolver {
       });
     }
 
-    return await queryBuilder.getMany();
+    const posts = await queryBuilder.getMany();
+
+    return {
+      posts: posts.slice(0, realLimit - 1),
+      hasMore: posts.length === realLimit,
+    };
   }
 
   @Query(() => Post, { nullable: true })
