@@ -6,4 +6,4 @@ export type MyContext = {
   req: express.Request & { session?: session.Session & { userId?: number } }; // join de types
   res: express.Response;
   redis: Redis;
-};
+}
